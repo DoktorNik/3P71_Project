@@ -1,24 +1,21 @@
 package Data;
 
-import javax.swing.*;
-import java.nio.file.Path;
-
 class PathFinderEntry implements Comparable<PathFinderEntry>{
 	private final Point     point;
 	private final String    path;
-	private final double    g;      // path cost (actual distance)
-	private double          h;      // heuristic score (?)
-	private int             n;      // priority
+	private final double    pathCost;               // distance from last point
+	private double          heuristicDistance;      // straight line distance to destination
+	private int             priority;
 
 	PathFinderEntry(Point point, String path, double pathCost) {
 		this.point  = point;
 		this.path   = path;
-		this.g      = pathCost;
+		this.pathCost = pathCost;
 	}
 
 	PathFinderEntry(Point point, String path, double pathCost, double heuristicScore) {
 		this(point, path, pathCost);
-		this.h = heuristicScore;
+		this.heuristicDistance = heuristicScore;
 	}
 
 	Point getPoint() {
@@ -26,7 +23,7 @@ class PathFinderEntry implements Comparable<PathFinderEntry>{
 	}
 
 	int getPriority() {
-		return n;
+		return priority;
 	}
 
 	String getPath() {
@@ -34,7 +31,7 @@ class PathFinderEntry implements Comparable<PathFinderEntry>{
 	}
 
 	public void setPriority(int n) {
-		this.n = n;
+		this.priority = n;
 	}
 
 	/**
@@ -78,17 +75,17 @@ class PathFinderEntry implements Comparable<PathFinderEntry>{
 	 */
 	@Override
 	public int compareTo(PathFinderEntry o) {
-		if (h != o.h) {
-			if (g > o.g)
+		if (heuristicDistance != o.heuristicDistance) {
+			if (pathCost > o.pathCost)
 				return 1;
-			else if(g > (o.g + 0.01) || g < (o.g - 0.01))
+			else if(pathCost > (o.pathCost + 0.01) || pathCost < (o.pathCost - 0.01))
 				return 0;
 			else
 				return -1;
 		} else {
-			if (h > o.h)
+			if (heuristicDistance > o.heuristicDistance)
 				return 1;
-			else if(h > (o.h + 0.01) || h < (o.h - 0.01))
+			else if(heuristicDistance > (o.heuristicDistance + 0.01) || heuristicDistance < (o.heuristicDistance - 0.01))
 				return 0;
 			else
 				return -1;

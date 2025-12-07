@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 class PathFinder {
-	private ArrayList<Point>                path        = new ArrayList<>();
+	//private ArrayList<Point>              path        = new ArrayList<>();
 	private ArrayList<Point>                searched    = new ArrayList<>();
 	private PriorityQueue<PathFinderEntry>  frontier    = new PriorityQueue<>();
 
@@ -20,7 +20,7 @@ class PathFinder {
 		double distanceFromLastPoint;
 
 		// initial
-		distanceToGoal = Manager.distanceBetween(start.getLatitude(), start.getLongitude(), end.getLatitude(), end.getLongitude());
+		distanceToGoal = PathManager.distanceBetween(start.getLatitude(), start.getLongitude(), end.getLatitude(), end.getLongitude());
 		PathFinderEntry pfe = new PathFinderEntry(start, start.getStreetName(), 0, distanceToGoal);
 		frontier.add(pfe);
 		searched.add(start);
@@ -39,18 +39,19 @@ class PathFinder {
 			for (Point point : entryPoint.getConnections()) {
 				String pathStr = entry.getPath() + " -> " + point.getStreetName();
 
-			// but first, did we find it?
-			if (point.equals(end)) {
-				distanceFromLastPoint	= Manager.distanceBetween(point.getLatitude(), point.getLongitude(), entryPoint.getLatitude(), entryPoint.getLongitude());
-				return new PathFinderEntry(point, pathStr, distanceFromLastPoint, 0);
-			}
+				// but first, did we find it?
+				if (point.equals(end)) {
+					distanceFromLastPoint	= PathManager.distanceBetween(point.getLatitude(), point.getLongitude(), entryPoint.getLatitude(), entryPoint.getLongitude());
+					return new PathFinderEntry(point, pathStr, distanceFromLastPoint, 0);
+				}
 
-			// don't duplicate search
-			if (searched.contains(point))   continue;
+				// don't duplicate search
+				if (searched.contains(point))   continue;
+
+				// actually add to search queue
 				searched.add(point);
-
-				distanceToGoal          = Manager.distanceBetween(point.getLatitude(), point.getLongitude(), end.getLatitude(), end.getLongitude());
-				distanceFromLastPoint	= Manager.distanceBetween(point.getLatitude(), point.getLongitude(), entryPoint.getLatitude(), entryPoint.getLongitude());
+				distanceToGoal          = PathManager.distanceBetween(point.getLatitude(), point.getLongitude(), end.getLatitude(), end.getLongitude());
+				distanceFromLastPoint	= PathManager.distanceBetween(point.getLatitude(), point.getLongitude(), entryPoint.getLatitude(), entryPoint.getLongitude());
 
 				// create and insert prioritized
 				frontier.add(new PathFinderEntry(point, pathStr, distanceFromLastPoint, distanceToGoal));

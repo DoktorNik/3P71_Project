@@ -2,12 +2,12 @@ package Data;
 
 import java.util.ArrayList;
 
-public class Manager {
+public class PathManager {
 	private ArrayList<Point>    points      = new ArrayList<>();
 	private final LoadCSV       csvLoader;
 	private final PathFinder    pathFinder  = new PathFinder();
 
-	public Manager(String fileName) {
+	public PathManager(String fileName) {
 		csvLoader   = new LoadCSV(fileName);
 		points      = csvLoader.getPoints();
 		calculateDistances();

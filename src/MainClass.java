@@ -3,7 +3,7 @@ import Data.*;
 import java.util.Scanner;
 
 public class MainClass {
-	Manager mgr;
+	PathManager mgr;
 
 	MainClass() {
 		Scanner cin     = new Scanner(System.in);
@@ -17,7 +17,7 @@ public class MainClass {
 		if (input.isEmpty())
 			input = "metadata.csv";
 
-		mgr = new Manager(input);
+		mgr = new PathManager(input);
 
 		// debug
 //		mgr.printPoints();
