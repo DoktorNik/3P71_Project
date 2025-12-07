@@ -54,8 +54,9 @@ class Point {
 	}
 
 	void addConnection(Point point, double distance) {
-		Double target = (connectionDistance + bufferArea) / 2;
+		double target = (connectionDistance + bufferArea) / 2;
 		//System.err.print("DEBUG: distance = " + distance + " target = " + target + " ");
+
 		// lol, no
 		if (distance > target) {
 			//System.err.println("BYE!");

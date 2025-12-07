@@ -1,5 +1,6 @@
 package Data;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class PathManager {
@@ -7,7 +8,7 @@ public class PathManager {
 	private final LoadCSV       csvLoader;
 	private final PathFinder    pathFinder  = new PathFinder();
 
-	public PathManager(String fileName) {
+	public PathManager(String fileName) throws IOException {
 		csvLoader   = new LoadCSV(fileName);
 		points      = csvLoader.getPoints();
 		calculateDistances();
@@ -47,20 +48,10 @@ public class PathManager {
 	}
 
 	public void printPath(String idFrom, String idTo) {
-		Point               start;
-		Point               end;
-		PathFinderEntry     solution;
+		Point               start       = findPoint(idFrom);
+		Point               end         = findPoint(idTo);
+		PathFinderEntry     solution    = pathFinder.findPath(start, end);
 
-		try {
-			start = findPoint(idFrom);
-			end = findPoint(idTo);
-		}
-		catch(RuntimeException e) {
-			System.err.println(e.getMessage());
-			return;
-		}
-
-		solution = pathFinder.findPath(start, end);
 		System.out.print("\nPath from " + idFrom + " to " + idTo + ":\n");
 		System.out.println(solution.getPath());
 	}

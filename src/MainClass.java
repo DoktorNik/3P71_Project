@@ -17,7 +17,12 @@ public class MainClass {
 		if (input.isEmpty())
 			input = "metadata.csv";
 
-		mgr = new PathManager(input);
+		try {
+			mgr = new PathManager(input);
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return;
+		}
 
 		// debug
 //		mgr.printPoints();

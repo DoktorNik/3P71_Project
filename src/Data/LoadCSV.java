@@ -13,7 +13,7 @@ class LoadCSV {
 		return points;
 	}
 
-	void LoadData(String fileName) {
+	void LoadData(String fileName) throws IOException {
 		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
 			String line;
 
@@ -34,14 +34,14 @@ class LoadCSV {
 				points.add(new Point(panoId, lat, lon, userLabel, 1.0)); // 2do: actual condition here
 			}
 		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
+			throw new FileNotFoundException(e.getMessage());
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new IOException(e.getMessage());
 		}
 
 	}
 
-	LoadCSV(String fileName) {
+	LoadCSV(String fileName) throws IOException {
 		LoadData(fileName);
 	}
 }

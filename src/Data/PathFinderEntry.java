@@ -5,7 +5,7 @@ class PathFinderEntry implements Comparable<PathFinderEntry>{
 	private final String    path;
 	private final double    pathCost;               // distance from last point
 	private double          heuristicDistance;      // straight line distance to destination
-	private int             priority;
+	private double          priority;
 
 	PathFinderEntry(Point point, String path, double pathCost) {
 		this.point  = point;
@@ -22,7 +22,7 @@ class PathFinderEntry implements Comparable<PathFinderEntry>{
 		return point;
 	}
 
-	int getPriority() {
+	double getPriority() {
 		return priority;
 	}
 
@@ -30,7 +30,7 @@ class PathFinderEntry implements Comparable<PathFinderEntry>{
 		return path;
 	}
 
-	public void setPriority(int n) {
+	public void setPriority(double n) {
 		this.priority = n;
 	}
 

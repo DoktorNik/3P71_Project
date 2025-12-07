@@ -8,7 +8,7 @@ class PathFinder {
 	private ArrayList<Point>                searched    = new ArrayList<>();
 	private PriorityQueue<PathFinderEntry>  frontier    = new PriorityQueue<>();
 
-	PathFinderEntry findPath(Point start, Point end) {
+	PathFinderEntry findPath(Point start, Point end) throws RuntimeException {
 		searched    = new ArrayList<>();
 		frontier    = new PriorityQueue<>();
 
