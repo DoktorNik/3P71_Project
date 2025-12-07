@@ -4,15 +4,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class PathManager {
-	private ArrayList<Point>    points      = new ArrayList<>();
+	private ArrayList<Point>    points          = new ArrayList<>();
 	private final LoadCSV       csvLoader;
-	private final PathFinder    pathFinder  = new PathFinder();
+	private final PathFinder    pathFinder      = new PathFinder();
+	private ArrayList<Point>    path            = new ArrayList<>();
+	private String              pathDelimiter   = " -> ";
 
 	public PathManager(String fileName) throws IOException {
 		csvLoader   = new LoadCSV(fileName);
 		points      = csvLoader.getPoints();
 		calculateDistances();
 		//System.err.println("Count: " + points.size());
+	}
+
+	public PathManager(String fileName, String pathDelimiter) throws IOException {
+		this(fileName);
+		this.pathDelimiter  = pathDelimiter;
 	}
 
 	public void printPoints() {
@@ -47,13 +54,45 @@ public class PathManager {
 		throw new RuntimeException("Could not find point with id '" + id + "'");
 	}
 
-	public void printPath(String idFrom, String idTo) {
-		Point               start       = findPoint(idFrom);
-		Point               end         = findPoint(idTo);
-		PathFinderEntry     solution    = pathFinder.findPath(start, end);
+	public void calculatePath(String idFrom, String idTo) throws RuntimeException {
+		Point           start       = findPoint(idFrom);
+		Point           end         = findPoint(idTo);
+		PathFinderEntry pathEntry   = pathFinder.findPath(start, end, pathDelimiter);
+		path    = new ArrayList<>();
 
-		System.out.print("\nPath from " + idFrom + " to " + idTo + ":\n");
-		System.out.println(solution.getPath());
+		String[] pathId = pathEntry.getPath().split(pathDelimiter);
+		for (String id : pathId) {
+			path.add(findPoint(id));
+		}
+	}
+
+	public String getPath() {
+		if(path.isEmpty())
+			throw new RuntimeException("Cannot get empty path. Calculate path first.");
+
+		// build textual representation of path
+		Point           start = path.get(0);
+		Point           end   = path.get(path.size()-1);
+		StringBuilder   ret   = new StringBuilder();
+
+		ret.append("\nPath from ")
+				.append(start.getStreetName())
+				.append(" to ")
+				.append(end.getStreetName())
+				.append(":\n");
+
+		for (int i = 0; i < path.size(); i++) {
+			ret.append(path.get(i).getStreetName());
+			if (i < path.size() - 1)
+				ret.append(pathDelimiter);
+		}
+
+		return ret.toString();
+	}
+
+	public String getPath(String idFrom, String idTo) {
+		calculatePath(idFrom, idTo);
+		return getPath();
 	}
 
 	// simplified function for calculating distance between 2 coordinates

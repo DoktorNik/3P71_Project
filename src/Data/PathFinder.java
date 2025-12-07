@@ -4,13 +4,10 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 class PathFinder {
-	//private ArrayList<Point>              path        = new ArrayList<>();
-	private ArrayList<Point>                searched    = new ArrayList<>();
-	private PriorityQueue<PathFinderEntry>  frontier    = new PriorityQueue<>();
 
-	PathFinderEntry findPath(Point start, Point end) throws RuntimeException {
-		searched    = new ArrayList<>();
-		frontier    = new PriorityQueue<>();
+	PathFinderEntry findPath(Point start, Point end, String pathDelimeter) throws RuntimeException {
+		ArrayList<Point>                searched    = new ArrayList<>();
+		PriorityQueue<PathFinderEntry>  frontier    = new PriorityQueue<>();
 
 		if (start.equals(end)) {
 			throw new RuntimeException("Cannot find path to current position");
@@ -21,14 +18,14 @@ class PathFinder {
 
 		// initial
 		distanceToGoal = PathManager.distanceBetween(start.getLatitude(), start.getLongitude(), end.getLatitude(), end.getLongitude());
-		PathFinderEntry pfe = new PathFinderEntry(start, start.getStreetName(), 0, distanceToGoal);
+		PathFinderEntry pfe = new PathFinderEntry(start, start.getId(), 0, distanceToGoal);
 		frontier.add(pfe);
 		searched.add(start);
 
 		// search
 		while (!frontier.isEmpty()) {
 			// check for solution
-			PathFinderEntry entry = frontier.remove();
+			PathFinderEntry entry   = frontier.remove();
 			Point entryPoint        = entry.getPoint();
 
 			// yay, found it
@@ -37,7 +34,7 @@ class PathFinder {
 
 			// score and add available paths to frontier
 			for (Point point : entryPoint.getConnections()) {
-				String pathStr = entry.getPath() + " -> " + point.getStreetName();
+				String pathStr = entry.getPath() + pathDelimeter + point.getId();
 
 				// but first, did we find it?
 				if (point.equals(end)) {

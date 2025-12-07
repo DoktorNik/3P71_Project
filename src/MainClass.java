@@ -40,7 +40,7 @@ public class MainClass {
 		// override for testing
 		toId    = "JsDDhoV5LiTIKJwuSxly9w";
 		fromId  = "QOIUeoy2pgWTdrK5gNObRw";
-		mgr.printPath(toId, fromId);
+		System.out.println(mgr.getPath(toId, fromId));
 	}
 
 	public static void main(String[] args) {
