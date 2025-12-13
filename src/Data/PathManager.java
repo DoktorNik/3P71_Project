@@ -1,24 +1,29 @@
 package Data;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class PathManager {
+	private SQLite              sql;
 	private ArrayList<Point>    points          = new ArrayList<>();
-	private final LoadCSV       csvLoader;
+	//private final LoadCSV       csvLoader;
 	private final PathFinder    pathFinder      = new PathFinder();
 	private ArrayList<Point>    path            = new ArrayList<>();
 	private String              pathDelimiter   = " -> ";
 
-	public PathManager(String fileName) throws IOException {
-		csvLoader   = new LoadCSV(fileName);
-		points      = csvLoader.getPoints();
-		calculateDistances();
+	public PathManager(boolean useCache) throws IOException, SQLException {
+		sql = new SQLite();
+		points  = sql.selectAllPoints();
+
+		//csvLoader   = new LoadCSV(fileName);
+		// points      = csvLoader.getPoints();
+		calculateDistances(useCache);
 		//System.err.println("Count: " + points.size());
 	}
 
-	public PathManager(String fileName, String pathDelimiter) throws IOException {
-		this(fileName);
+	public PathManager(String pathDelimiter, boolean useCache) throws IOException, SQLException {
+		this(useCache);
 		this.pathDelimiter  = pathDelimiter;
 	}
 
@@ -34,13 +39,26 @@ public class PathManager {
 		}
 	}
 
-	private void calculateDistances() {     // for setup
+	private void calculateDistances(boolean useCache) {     // for setup
 //		Point p1 = points.get(0);
 		for (Point p1 : points) {
 			for (Point p2 : points) {
 			if (p1.equals(p2)) continue;    // don't connect to self
-				double distance = distanceBetween(p1.getLatitude(), p1.getLongitude(), p2.getLatitude(), p2.getLongitude());
+				double distance = -1;
+				if (useCache) {
+					try {
+						distance = sql.getDistance(p1.getId(), p2.getId());
+					} catch (SQLException e) {
+						System.err.println("SQL error in retrieving distances from database! Recalculating");
+					}
+				}
+				if (distance < 0) {
+					distance = distanceBetween(p1.getLatitude(), p1.getLongitude(), p2.getLatitude(), p2.getLongitude());
+					sql.upsertDistance(p1.getId(), p2.getId(), distance);
+					sql.upsertDistance(p2.getId(), p1.getId(), distance);       // undirected graph
+				}
 				p1.addConnection(p2, distance);
+				p2.addConnection(p1, distance);     // undirected graph
 			}
 		}
 	}
@@ -106,5 +124,4 @@ public class PathManager {
 		double y = dLat;
 		return R * Math.hypot(x, y); // meters
 	}
-
 }

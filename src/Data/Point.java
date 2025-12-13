@@ -54,6 +54,11 @@ class Point {
 	}
 
 	void addConnection(Point point, double distance) {
+
+		// no dups
+		if (connections.contains(point))
+			return;
+
 		double target = (connectionDistance + bufferArea) / 2;
 		//System.err.print("DEBUG: distance = " + distance + " target = " + target + " ");
 

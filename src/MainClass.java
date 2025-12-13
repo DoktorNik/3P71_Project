@@ -1,5 +1,6 @@
 import Data.*;
 
+import java.nio.file.Path;
 import java.util.Scanner;
 
 public class MainClass {
@@ -11,14 +12,16 @@ public class MainClass {
 		String toId;
 		String fromId;
 
-		System.out.println("Enter CSV filename to load data (enter for default): ");
+		//System.out.println("Enter CSV filename to load data (enter for default): ");
 		//input = cin.nextLine();
 
-		if (input.isEmpty())
-			input = "metadata.csv";
+//		if (input.isEmpty())
+//			input = "metadata.csv";
 
+		System.out.println("Loading point data and computing connections...");
 		try {
-			mgr = new PathManager(input);
+			//mgr = new PathManager(input, " <-> ", true);
+			mgr = new PathManager(" <-> ", true);
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			return;
@@ -40,6 +43,7 @@ public class MainClass {
 		// override for testing
 		toId    = "JsDDhoV5LiTIKJwuSxly9w";
 		fromId  = "QOIUeoy2pgWTdrK5gNObRw";
+		System.out.println("Calculating path from " + fromId + " to " + toId + "...");
 		System.out.println(mgr.getPath(toId, fromId));
 	}
 
