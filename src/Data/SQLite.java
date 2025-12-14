@@ -34,7 +34,7 @@ class SQLite {
 
 	ArrayList<Point> selectAllPoints() {
 		ArrayList<Point> points = new ArrayList<>();
-		String q    = "SELECT id, latitude, longitude, street_name, condition FROM points";
+		String q    = "SELECT id, latitude, longitude, street_name, street_type, condition FROM points";
 
 		try (PreparedStatement  ps  = connection.prepareStatement(q);
 		     ResultSet rs  = ps.executeQuery())
@@ -45,6 +45,7 @@ class SQLite {
 						rs.getDouble("latitude"),
 						rs.getDouble("longitude"),
 						rs.getString("street_name"),
+						StreetTypeCodec.fromDb(rs.getString("street_type")),
 						rs.getDouble("condition")
 					)
 				);
@@ -87,6 +88,19 @@ class SQLite {
 			preparedStatement.setString(1, fromId);
 			preparedStatement.setString(2, toId);
 			preparedStatement.setDouble(3, d);
+			preparedStatement.executeUpdate();
+		}
+		catch (SQLException e) {
+			error(e);
+		}
+	}
+
+	void updateStreetInfo (String streetName, PathManager.StreetType streetType, String id) {
+		String q = "UPDATE points SET street_name = ?, street_type = ? WHERE id = ?";
+		try(PreparedStatement preparedStatement = connection.prepareStatement(q)) {
+			preparedStatement.setString(1, streetName);
+			preparedStatement.setString(2, StreetTypeCodec.toDb(streetType));
+			preparedStatement.setString(3, id);
 			preparedStatement.executeUpdate();
 		}
 		catch (SQLException e) {

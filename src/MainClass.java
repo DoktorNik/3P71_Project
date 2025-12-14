@@ -42,12 +42,19 @@ public class MainClass {
 //		System.out.println("Enter destination: ");
 //		fromId = cin.nextLine();
 
+
+
 		// override for testing
 		toId    = "JsDDhoV5LiTIKJwuSxly9w";
 		fromId  = "QOIUeoy2pgWTdrK5gNObRw";
 		System.out.println("Calculating path from " + fromId + " to " + toId + "...");
 		System.out.println(mgr.getPath(toId, fromId));
 		System.out.println("See ./out/route.html for visual path");
+
+
+		// keep updating street info
+		while (mgr.isWorking()) {
+		}
 	}
 
 	public static void main(String[] args) {

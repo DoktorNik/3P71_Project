@@ -42,7 +42,7 @@ final class RouteHtml {
 						"    .num-label{background:#1f2937;color:#fff;border-radius:10px;padding:2px 6px;"
 						+ "font:12px system-ui;border:1px solid rgba(0,0,0,0.25)}\n" +
 						"    .street-label{background:rgba(255,255,255,0.85);color:#111;"
-						+ "border-radius:6px;padding:2px 6px;font:11px system-ui;"
+						+ "border-radius:12px;padding:2px 12px;font:11px system-ui;"
 						+ "border:1px solid rgba(0,0,0,0.2)}\n" +
 						"    .start{background:#10b981}\n" +
 						"    .end{background:#ef4444}\n" +
@@ -68,7 +68,7 @@ final class RouteHtml {
 						"      var isEnd = idx === pts.length - 1;\n" +
 						"      var color = isStart ? '#10b981' : (isEnd ? '#ef4444' : '#2563eb');\n" +
 						"      L.circleMarker([p.lat, p.lon], {\n" +
-						"        radius: isStart || isEnd ? 6 : 4,\n" +
+						"        radius: isStart ? 6 : 12,\n" +
 						"        color: color,\n" +
 						"        fillColor: color,\n" +
 						"        fillOpacity: 0.85\n" +

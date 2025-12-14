@@ -31,7 +31,7 @@ class LoadCSV {
 				double lon = Double.parseDouble(row[3]);
 				String userLabel = row[9]; // may be empty
 
-				points.add(new Point(panoId, lat, lon, userLabel, 1.0)); // 2do: actual condition here
+				points.add(new Point(panoId, lat, lon, userLabel, PathManager.StreetType.UNKNOWN, 1.0)); // 2do: actual condition here
 			}
 		} catch (FileNotFoundException e) {
 			throw new FileNotFoundException(e.getMessage());

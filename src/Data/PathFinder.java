@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 class PathFinder {
+	double                          streetChangeMod = 2.5;
 
 	PathFinderEntry findPath(Point start, Point end, String pathDelimeter) throws RuntimeException {
-		ArrayList<Point>                searched    = new ArrayList<>();
-		PriorityQueue<PathFinderEntry>  frontier    = new PriorityQueue<>();
+		ArrayList<Point>                searched            = new ArrayList<>();
+		PriorityQueue<PathFinderEntry>  frontier            = new PriorityQueue<>();
 
 		if (start.equals(end)) {
 			throw new RuntimeException("Cannot find path to current position");
@@ -18,7 +19,7 @@ class PathFinder {
 
 		// initial
 		distanceToGoal = PathManager.distanceBetween(start.getLatitude(), start.getLongitude(), end.getLatitude(), end.getLongitude());
-		PathFinderEntry pfe = new PathFinderEntry(start, start.getId(), 0, distanceToGoal);
+		PathFinderEntry pfe = new PathFinderEntry(start, start, start.getId(), 0, distanceToGoal);
 		frontier.add(pfe);
 		searched.add(start);
 
@@ -39,7 +40,7 @@ class PathFinder {
 				// but first, did we find it?
 				if (point.equals(end)) {
 					distanceFromLastPoint	= PathManager.distanceBetween(point.getLatitude(), point.getLongitude(), entryPoint.getLatitude(), entryPoint.getLongitude());
-					return new PathFinderEntry(point, pathStr, distanceFromLastPoint, 0);
+					return new PathFinderEntry(point, entryPoint, pathStr, distanceFromLastPoint, 0);
 				}
 
 				// don't duplicate search
@@ -47,13 +48,26 @@ class PathFinder {
 
 				// actually add to search queue
 				searched.add(point);
-				distanceToGoal          = PathManager.distanceBetween(point.getLatitude(), point.getLongitude(), end.getLatitude(), end.getLongitude());
+				double heuristicScore   = generateScore(point, entry.getPrevPoint(), end);
+				//distanceToGoal          = PathManager.distanceBetween(point.getLatitude(), point.getLongitude(), end.getLatitude(), end.getLongitude());
 				distanceFromLastPoint	= PathManager.distanceBetween(point.getLatitude(), point.getLongitude(), entryPoint.getLatitude(), entryPoint.getLongitude());
 
 				// create and insert prioritized
-				frontier.add(new PathFinderEntry(point, pathStr, distanceFromLastPoint, distanceToGoal));
+				frontier.add(new PathFinderEntry(point, entryPoint, pathStr, distanceFromLastPoint, heuristicScore));
 			}
 		}
 		throw new RuntimeException("Failed to find path from " + start.getStreetName() + " to " + end.getStreetName());
+	}
+
+	private double generateScore(Point point, Point prevPoint, Point end) {
+		double distanceToGoal   = PathManager.distanceBetween(point.getLatitude(), point.getLongitude(), end.getLatitude(), end.getLongitude());
+		double heuristicScore   = distanceToGoal;
+
+		// penalize changing streets
+		if (!point.getStreetName().equals(prevPoint.getStreetName())) {
+			heuristicScore *= streetChangeMod;
+		}
+
+		return heuristicScore;
 	}
 }

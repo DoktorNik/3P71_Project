@@ -4,17 +4,31 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class PathManager {
 	private SQLite              sql;
-	private ArrayList<Point>    points          = new ArrayList<>();
+	PointEnrichmentService      service;
 	//private final LoadCSV     csvLoader;
 	private final PathFinder    pathFinder      = new PathFinder();
 	private ArrayList<Point>    path            = new ArrayList<>();
 	private String              pathDelimiter;
 	private double              bufferArea;
+	private ArrayList<Point>    points          = new ArrayList<>();
 	private static final String DEFAULT_DELIMITER   = " -> ";
 	private static final double DEFAULT_BUFFER_AREA = 1086.82;  // average 1086.82 max 2239.73 thanks chat
+
+
+	public enum StreetType {
+		ROAD,
+		PEDESTRIAN,
+		FOOTWAY,
+		CYCLEWAY,
+		SERVICE,
+		PATH,
+		UNKNOWN
+	}
 
 	public PathManager(boolean useCache) throws IOException, SQLException {
 		this(DEFAULT_DELIMITER, useCache, DEFAULT_BUFFER_AREA);
@@ -36,8 +50,38 @@ public class PathManager {
 
 		//csvLoader   = new LoadCSV(fileName);
 		// points      = csvLoader.getPoints();
-		calculateDistances(useCache);
+
 		//System.err.println("Count: " + points.size());
+
+		ReverseGeocoder geocoder =
+				new ReverseGeocoder("3P71Project/1.0 (nik@wrinklyideas.com)");
+
+		service =
+				new PointEnrichmentService(geocoder, new PointEnrichmentService.Listener() {
+					@Override
+					public void onPointUpdated(Point p, StreetInfo info) {
+						sql.updateStreetInfo(p.getStreetName(), p.getStreetType(), p.getId());
+
+						System.out.printf("Updated %-2s -> %s (%s)%n",
+								p.getId(),
+								p.getStreetName(),
+								p.getStreetType());
+					}
+					@Override
+					public void onIdle() {
+						// No work this second; continue doing other things
+					}
+				});
+		service.start();
+
+		// Enqueue without blocking
+		for (Point point : points) {
+			if (point.getStreetType() == StreetType.UNKNOWN)
+				service.enqueue(point);
+		}
+		//service.enqueueAll(points);
+
+		calculateDistances(useCache);
 	}
 
 	public void printPoints() {
@@ -86,37 +130,93 @@ public class PathManager {
 	}
 
 	public void calculatePath(String idFrom, String idTo) throws RuntimeException {
-		Point           start       = findPoint(idFrom);
-		Point           end         = findPoint(idTo);
-		PathFinderEntry pathEntry   = pathFinder.findPath(start, end, pathDelimiter);
-		path    = new ArrayList<>();
+		Point               start       = findPoint(idFrom);
+		Point               end         = findPoint(idTo);
+		PathFinderEntry     pathEntry   = pathFinder.findPath(start, end, pathDelimiter);
+		ArrayList<Point>    rawPath     = new ArrayList<>();
 
 		String[] pathId = pathEntry.getPath().split(pathDelimiter);
 		for (String id : pathId) {
-			path.add(findPoint(id));
+			rawPath.add(findPoint(id));
 		}
+
+		path = rawPath;
+		//path = clean(rawPath);
 	}
+
+	 static ArrayList<Point> clean(ArrayList<Point> raw) {
+		 // Tunables — adjust to taste
+		 final double STRAIGHT_DEG = 25.0; // <= this = straight
+		 final double SHORT_M      = 50.0; // very short hop
+		 final double EPSILON_M    = 3.0;  // near-duplicate point
+
+		 if (raw == null || raw.size() <= 2) return raw;
+
+		ArrayList<Point> out = new ArrayList<>();
+		out.add(raw.get(0));
+
+		for (int i = 1; i < raw.size() - 1; i++) {
+			Point prevKept = out.get(out.size() - 1);
+			Point curr     = raw.get(i);
+			Point next     = raw.get(i + 1);
+
+			// 0) Drop near-duplicates
+			if (Geo.distanceMeters(prevKept, curr) <= EPSILON_M) continue;
+
+			double b1 = Geo.bearing(prevKept, curr);
+			double b2 = Geo.bearing(curr, next);
+			double deflection = minimalAngle(b1, b2);
+
+			String prevStreet = prevKept.getStreetName();
+			String currStreet = curr.getStreetName();
+			String nextStreet = next.getStreetName();
+
+			// 1) Single-frame street-name glitch: A, B, A  (with tiny deflection & short hop)
+			if (eq(prevStreet, nextStreet) && !eq(prevStreet, currStreet)
+					&& deflection <= STRAIGHT_DEG
+					&& Geo.distanceMeters(prevKept, curr) <= SHORT_M) {
+				// skip 'curr' — it's a blip
+				continue;
+			}
+
+			// 2) “Straight” but street name changes — likely noise; drop curr
+			if (deflection <= STRAIGHT_DEG && !eq(currStreet, prevStreet)) {
+				// optionally: if nextStreet equals prevStreet, it’s definitely a blip; skip
+				// otherwise you could keep and relabel, but you asked to ignore, so skip
+				continue;
+			}
+
+			// 3) Otherwise, keep it
+			out.add(curr);
+		}
+
+		// Always keep the last point
+		out.add(raw.get(raw.size() - 1));
+		return out;
+	}
+
+	private static boolean eq(String a, String b) {
+		return Objects.equals(a, b);
+	}
+
+	private static double minimalAngle(double a, double b) {
+		double d = (b - a + 360.0) % 360.0;
+		return d <= 180.0 ? d : 360.0 - d;
+	}
+
 
 	public String getPath() {
 		validatePath();
 
-		// build textual representation of path
-		Point           start = path.get(0);
-		Point           end   = path.get(path.size()-1);
+//		// build textual representation of path
 		StringBuilder   ret   = new StringBuilder();
 
-		ret.append("\nPath from ")
-				.append(start.getStreetName())
-				.append(" to ")
-				.append(end.getStreetName())
-				.append(":\n");
-
-		for (int i = 0; i < path.size(); i++) {
-			ret.append(path.get(i).getStreetName());
-			if (i < path.size() - 1)
-				ret.append(pathDelimiter);
+		List<String> directions = Geo.buildInstructions(path);
+		for (String step: directions) {
+			ret.append(step).append("\n");
 		}
 
+		// map display
 		Path html = Path.of("out", "route.html");
 		try {
 			RouteHtml.writeLeafletHtml(html, path, true, true);
@@ -159,5 +259,9 @@ public class PathManager {
 		double x = dLon * Math.cos((lat1r + lat2r) / 2.0);
 		double y = dLat;
 		return R * Math.hypot(x, y); // meters
+	}
+
+	public boolean isWorking() {
+		return !service.isQueueEmpty();
 	}
 }

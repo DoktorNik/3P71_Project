@@ -3,24 +3,22 @@ package Data;
 import java.util.ArrayList;
 
 class Point {
-	private final String        id;
-	private final double        latitude;
-	private final double        longitude;
-	private final String        streetName;
-	private final double        condition;
-	private ArrayList<Point>    connections         = new ArrayList<>();
-	private double              connectionDistance  = Double.MAX_VALUE;
+	private final String            id;
+	private final double            latitude;
+	private final double            longitude;
+	private String                  streetName;
+	private PathManager.StreetType  streetType  = PathManager.StreetType.UNKNOWN;
+	private final double            condition;
+	private ArrayList<Point>        connections         = new ArrayList<>();
+	private double                  connectionDistance  = Double.MAX_VALUE;
 
-	Point(String id, double latitude, double longitude, String streetName, double condition) {
+	Point(String id, double latitude, double longitude, String streetName, PathManager.StreetType streetType, double condition) {
 		this.id         = id;
 		this.latitude   = latitude;
 		this.longitude  = longitude;
-
-		// 2do: update this when you get street names
-		//this.streetName   = streetName;
-		this.streetName     = id;
-
 		this.condition  = condition;
+		this.streetType = streetType;
+		this.streetName = streetName;
 	}
 
 	ArrayList<Point> getConnections() {
@@ -43,8 +41,17 @@ class Point {
 		return streetName;
 	}
 
+	public PathManager.StreetType getStreetType() {
+		return streetType;
+	}
+
 	double getCondition() {
 		return condition;
+	}
+
+	void setStreet(String streetName, PathManager.StreetType type) {
+		this.streetName = streetName;
+		this.streetType = type;
 	}
 
 	void addConnection(Point point, double distance, double bufferArea) {
