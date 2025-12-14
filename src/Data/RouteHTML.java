@@ -147,7 +147,7 @@ final class RouteHtml {
 						"  <style>\n" +
 						"    html,body,#map{height:100%;margin:0}\n" +
 						"    .street-label{background:rgba(255,255,255,0.85);color:#111;"
-						+ "border-radius:6px;padding:2px 6px;font:11px system-ui;"
+						+ "border-radius:12px;padding:2px 6px;font:11px system-ui;"
 						+ "border:1px solid rgba(0,0,0,0.2)}\n" +
 						"  </style>\n" +
 						"</head>\n" +
@@ -168,7 +168,7 @@ final class RouteHtml {
 						"    pts.forEach(function(p){\n" +
 						"      bounds.push([p.lat, p.lon]);\n" +
 						"      L.circleMarker([p.lat, p.lon], {\n" +
-						"        radius: 4,\n" +
+						"        radius: 12,\n" +
 						"        color: '#2563eb',\n" +
 						"        fillColor: '#2563eb',\n" +
 						"        fillOpacity: 0.75\n" +

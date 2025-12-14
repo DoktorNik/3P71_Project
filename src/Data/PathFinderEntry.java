@@ -75,20 +75,14 @@ class PathFinderEntry implements Comparable<PathFinderEntry>{
 	 */
 	@Override
 	public int compareTo(PathFinderEntry o) {
-		if (heuristicDistance != o.heuristicDistance) {
-			if (pathCost > o.pathCost)
-				return 1;
-			else if(pathCost > (o.pathCost + 0.01) || pathCost < (o.pathCost - 0.01))
-				return 0;
-			else
-				return -1;
-		} else {
-			if (heuristicDistance > o.heuristicDistance)
-				return 1;
-			else if(heuristicDistance > (o.heuristicDistance + 0.01) || heuristicDistance < (o.heuristicDistance - 0.01))
-				return 0;
-			else
-				return -1;
-		}
+		int c = Double.compare(this.heuristicDistance + this.pathCost, o.heuristicDistance + o.pathCost);
+		if (c != 0)
+			return c;
+
+		c = Double.compare(this.heuristicDistance, o.heuristicDistance);
+		if (c != 0)
+			return c;
+
+		return 1;
 	}
 }

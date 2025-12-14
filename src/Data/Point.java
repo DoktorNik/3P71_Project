@@ -57,11 +57,8 @@ class Point {
 		//double target = (connectionDistance + bufferArea) / 2;
 		//System.err.print("DEBUG: distance = " + distance + " target = " + target + " ");
 
-		if (distance > bufferArea)
-			return;
-		else {
+		if (distance <= bufferArea)
 			connections.add(point);
-		}
 
 
 //		// lol, no

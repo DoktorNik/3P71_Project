@@ -21,7 +21,7 @@ public class MainClass {
 		System.out.println("Loading point data and computing connections...");
 		try {
 			//mgr = new PathManager(input, " <-> ", true);
-			mgr = new PathManager(" <-> ", false, 350);
+			mgr = new PathManager(" <-> ", false, 175);
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			return;
