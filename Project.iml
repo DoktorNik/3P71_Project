@@ -16,16 +16,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/src/sqlite-jdbc-3.47.2.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="library" name="fasterxml.jackson.core.databind" level="project" />
     <orderEntry type="module" module-name="lib" />
   </component>
 </module>

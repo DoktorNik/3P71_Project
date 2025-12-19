@@ -1,10 +1,23 @@
+/**
+ * Nikolas Fraser
+ * 5538939
+ * Dec 19, 2025
+ * COSC 3P71
+ */
+
 import lib.PathManager;
 
 import java.util.Scanner;
 
+/**
+ * the main class i.e., entry point of the program
+ */
 public class MainClass {
 	PathManager mgr;
 
+	/**
+	 * do some stuff
+	 */
 	MainClass() {
 		Scanner cin     = new Scanner(System.in);
 		String input    = "";
@@ -54,8 +67,7 @@ public class MainClass {
 		System.out.println("See ./out/route.html for visual path");
 
 		// keep updating street info
-		while (mgr.isWorking()) {
-		}
+		while (mgr.isWorking()) {}
 	}
 
 	public static void main(String[] args) {
