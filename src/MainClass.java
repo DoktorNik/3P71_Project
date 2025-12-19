@@ -1,6 +1,5 @@
-import Data.*;
+import lib.PathManager;
 
-import java.nio.file.Path;
 import java.util.Scanner;
 
 public class MainClass {
@@ -20,8 +19,8 @@ public class MainClass {
 
 		System.out.println("Loading point data and computing connections...");
 		try {
-			//mgr = new PathManager(input, " <-> ", true);
-			//mgr = new PathManager(" <-> ", false, 175);
+			//mgr = new lib.PathManager(input, " <-> ", true);
+			//mgr = new lib.PathManager(" <-> ", false, 175);
 			mgr = new PathManager(" <-> ", false, 200);
 		} catch (Exception e) {
 			System.err.println(e.getMessage());

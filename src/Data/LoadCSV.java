@@ -1,5 +1,7 @@
 package Data;
 
+import Data.Point;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -31,7 +33,7 @@ class LoadCSV {
 				double lon = Double.parseDouble(row[3]);
 				String userLabel = row[9]; // may be empty
 
-				points.add(new Point(0, panoId, lat, lon, userLabel, PathManager.StreetType.UNKNOWN, 1.0)); // 2do: actual condition here
+				points.add(new Point(0, panoId, lat, lon, userLabel, lib.PathManager.StreetType.UNKNOWN, 1.0)); // 2do: actual condition here
 			}
 		} catch (FileNotFoundException e) {
 			throw new FileNotFoundException(e.getMessage());

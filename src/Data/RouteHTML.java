@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
 
-final class RouteHtml {
+public class RouteHTML {
 
 	public static void writeLeafletHtml(Path htmlFile,
 	                                    List<Point> route,
