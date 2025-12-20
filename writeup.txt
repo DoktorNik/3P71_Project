@@ -1,0 +1,20 @@
+The application utilizes an A* algorithm to find a desirable path to a given destination. The generated path is then used to build a list of instructions to be used as directions for the user to follow. The directions indicate whether a turn is required, which street to travel on, and how far to travel until the next instruction.
+
+The Haversine formula is used to calculate the distance between two points, as all points are stored as GPS coordinates i.e., pairs of latitude and longitude values. An approximation of 6,371,000 meters is used for the radius of the Earth.
+
+In order to properly display a list of instructions, the application calls OpenStreetMap’s Nominatim reverse geocode API to retrieve the street names for stored GPS coordinates. Respecting the limitations of the API, the application utilizes multithreading, making 1 call per second while there are outstanding point to street name mappings. 
+
+The heuristic used is based upon straight-line distance to the destination, as well as a small penalty applied for changing streets, since it is generally preferable to travel on major roads instead of winding through a city. Finally, the condition of the road, represented by a value between 0 and 1, with 0 being an inaccessible road and 1 being a road in perfect condition, acts to modify the fitness of the relevant section of the path. A cut-off point of minimal road condition results in the worst possible heuristic score, so that dangerous roads are avoided if it is at all possible. In case of duplicate heuristic scores, the score values are ignored and the algorithm falls back to prioritizing the point closest to the destination.
+
+heuristicScore =  distanceBetweenThisPointAndNext;
+heuristicScore *= modifierForChangingStreets;
+
+if (roadConditionAtThisPoint < minimumAllowableRoadCondition) then
+     heuristicScore = MAX;
+else
+     heuristicScore *= 1+(1 - roadCondition);
+
+
+After the route is generated, an HTML page is created which shows the route overlayed onto Google Maps via OpenStreetView. The map lists each point along the route, along with labels showing the name of the street which the point is on. Each point is numbered, with the first point being colour-coded in green, and the last point being colour-coded in red, representing the start and end points respectively.
+
+The application features an sqlite database for storing necessary data, such as the GPS coordinates of all points, conditions of the roads at each point, as well as the street names acquired by OpenStreetMap’s reverse geocode API. The information is cached by default to avoid unnecessary computation. The cache will be automatically updated in case of detected errors, and can be rebuilt manually upon launching the app.
