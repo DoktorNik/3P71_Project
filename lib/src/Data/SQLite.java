@@ -19,7 +19,7 @@ import java.util.ArrayList;
  * class for utilizing sqlite database
  */
 public class SQLite {
-	private final   String      DB_FILE    = "../lib/data/points.db";
+	private final   String      DB_FILE    = "lib/data/points.db";
 	private final Connection    connection;
 
 	public SQLite() throws SQLException {
@@ -33,6 +33,11 @@ public class SQLite {
 			throw new IllegalStateException("DB file not found: " + absolute);
 		}
 
+		try {
+			Class.forName("org.sqlite.JDBC");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		connection = DriverManager.getConnection(URL);
 //		System.out.println("Connected: " + (connection != null));
 //		System.out.println("JDBC URL: " + URL);

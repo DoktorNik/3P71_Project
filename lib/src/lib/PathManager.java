@@ -377,8 +377,8 @@ public class PathManager {
 	 */
 	public void buildMap() {
 		// map display
-		Path template   = Path.of("map_template.html");
-		Path html       = Path.of("out", "route.html");
+		Path template   = Path.of("map/","map_template.html");
+		Path html       = Path.of("map/", "route.html");
 		try {
 			ArrayList<Point> pathD = paths[2].isEmpty() ? null : paths[2];
 			RouteMapWriter.writeMapHtml(template,  html, paths[0], paths[1], pathD);

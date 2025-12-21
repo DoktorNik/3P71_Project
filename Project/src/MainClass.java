@@ -64,7 +64,7 @@ public class MainClass {
 		System.out.println(mgr.getPath(toId, fromId, 0));
 		System.out.println("===============================");
 		System.out.println(mgr.getPath(toId, fromId, 1));
-		System.out.println("See ./out/route.html for visual path");
+		System.out.println("See map/route.html for visual path");
 
 		// keep updating street info
 		while (mgr.isWorking()) {}
