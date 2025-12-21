@@ -128,6 +128,59 @@ public class PathManager {
 	}
 
 	/**
+	 * private function to get the road info from a point
+	 * @param point the point
+	 * @return array of strings
+	 * [0] street name
+	 * [1] street condition
+	 * [2] obstacle
+	 */
+	private String[] getRoadInfo(Point point) {
+		String[] roadInfo = new String[3];
+		roadInfo[0] = point.getStreetName();
+		roadInfo[1] = String.valueOf(point.getCondition());
+		roadInfo[2] = "unknown";        // 2do: implement after getting actual info
+		return roadInfo;
+	}
+
+
+	/**
+	 *  get information about a section of road
+	 * @param lat   - latitude of the point
+	 * @param lon   - longitude of the point
+	 * @return array of strings
+	 * [0] street name
+	 * [1] street condition
+	 * [2] obstacle
+	 */
+	public String[] getRoadInfo(double lat, double lon) {
+		for (Point point: points) {
+			if (point.getLatitude() == lat && point.getLongitude() == lon)
+				return getRoadInfo(point);
+		}
+
+		throw new RuntimeException("No point with latitude '" + lat + "' longitude '" + lon + "' to get street info for!");
+	}
+
+	/**
+	 * get information about a section of road
+	 * @param id    the database id of the road segment
+	 * @return  array of strings
+	 * [0] street name
+	 * [1] street condition
+	 * [2] obstacle
+	 */
+	public String[] getRoadInfo(String id) {
+		for (Point point : points) {
+			if (point.getId().equals(id)) {
+				return getRoadInfo(point);
+			}
+ 		}
+
+		throw new RuntimeException("No point with id '" + id + "' to get street info for!");
+	}
+
+	/**
 	 * because we need to submit the matrix
 	 */
 	private void buildAdjacencyMatrix() {
